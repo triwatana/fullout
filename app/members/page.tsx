@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
 type Team = {
   id: string;
   name: string;
+  invite_code: string | null;
 };
 
 type Membership = {
@@ -25,262 +26,319 @@ type Profile = {
   avatar_url: string | null;
 };
 
-type Member = {
-  id: string;
-  user_id: string;
-  role: string;
-  member_since: string | null;
-  member_since_year: number | null;
-  name: string;
-  email: string;
-  avatar_url: string | null;
+type Member = Membership & {
+  profile: Profile | null;
 };
 
-const roles = ["director", "captain", "choreographer", "dancer", "alumni"];
+const ROLE_OPTIONS = [
+  "director",
+  "captain",
+  "choreographer",
+  "dancer",
+  "alumni",
+];
 
-const seasons = ["Spring", "Summer", "Fall"];
+const ROLE_LABELS: Record<string, string> = {
+  director: "Director",
+  captain: "Captain",
+  choreographer: "Choreographer",
+  dancer: "Dancer",
+  alumni: "Alumni",
+};
+
+const ROLE_DESCRIPTIONS: Record<string, string> = {
+  director: "Team leadership",
+  captain: "Team leadership",
+  choreographer: "Choreography",
+  dancer: "Performer",
+  alumni: "Former member",
+};
+
+function formatRole(role: string) {
+  return ROLE_LABELS[role] ?? role;
+}
+
+function formatMemberSince(season: string | null, year: number | null) {
+  if (!season && !year) return "Member since —";
+  if (season && year) return `Member since ${season} ${year}`;
+  if (year) return `Member since ${year}`;
+  return `Member since ${season}`;
+}
+
+function getInitials(name: string | null, email: string | null) {
+  const value = name?.trim() || email?.trim() || "?";
+
+  const parts = value.split(/\s+/).filter(Boolean);
+
+  if (parts.length >= 2) {
+    return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+  }
+
+  return value.slice(0, 2).toUpperCase();
+}
 
 export default function MembersPage() {
   const supabase = createClient();
 
-  const [team, setTeam] = useState<Team | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [activeTeam, setActiveTeam] = useState<Team | null>(null);
   const [members, setMembers] = useState<Member[]>([]);
+  const [currentRole, setCurrentRole] = useState<string | null>(null);
+
   const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
-  const [showModal, setShowModal] = useState(false);
-  const [adding, setAdding] = useState(false);
-
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [role, setRole] = useState("dancer");
-  const [memberSince, setMemberSince] = useState("Fall");
-  const [memberSinceYear, setMemberSinceYear] = useState(
-    new Date().getFullYear().toString(),
-  );
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     loadMembers();
+
+    function handleStorageChange(event: StorageEvent) {
+      if (event.key === "fullout_active_team") {
+        loadMembers();
+      }
+    }
+
+    window.addEventListener("storage", handleStorageChange);
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
   }, []);
 
   async function loadMembers() {
     setLoading(true);
     setError("");
+    setSuccess("");
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    try {
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
 
-    if (!user) {
-      window.location.href = "/login";
-      return;
-    }
-
-    let activeTeamId = localStorage.getItem("fullout_active_team");
-
-    const { data: memberships, error: membershipError } = await supabase
-      .from("team_members")
-      .select("id, team_id, user_id, role, member_since, member_since_year")
-      .eq("user_id", user.id);
-
-    if (membershipError) {
-      setError(membershipError.message);
-      setLoading(false);
-      return;
-    }
-
-    const membershipRows = (memberships || []) as Membership[];
-
-    if (membershipRows.length === 0) {
-      setLoading(false);
-      return;
-    }
-
-    const validMembership = membershipRows.find(
-      (membership) => membership.team_id === activeTeamId,
-    );
-
-    if (!validMembership) {
-      activeTeamId = membershipRows[0].team_id;
-      localStorage.setItem("fullout_active_team", activeTeamId);
-    }
-
-    if (!activeTeamId) {
-      setError("No active team selected.");
-      setLoading(false);
-      return;
-    }
-
-    const selectedTeamId = activeTeamId;
-
-    const { data: teamData, error: teamError } = await supabase
-      .from("teams")
-      .select("id, name")
-      .eq("id", selectedTeamId)
-      .maybeSingle();
-
-    if (teamError) {
-      setError(teamError.message);
-      setLoading(false);
-      return;
-    }
-
-    if (!teamData) {
-      setError("Team not found.");
-      setLoading(false);
-      return;
-    }
-
-    setTeam(teamData as Team);
-
-    const { data: teamMemberships, error: teamMembersError } = await supabase
-      .from("team_members")
-      .select("id, team_id, user_id, role, member_since, member_since_year")
-      .eq("team_id", selectedTeamId)
-      .order("created_at", { ascending: true });
-
-    if (teamMembersError) {
-      setError(teamMembersError.message);
-      setLoading(false);
-      return;
-    }
-
-    const memberRows = (teamMemberships || []) as Membership[];
-
-    if (memberRows.length === 0) {
-      setMembers([]);
-      setLoading(false);
-      return;
-    }
-
-    const userIds = memberRows.map((member) => member.user_id);
-
-    const { data: profileRows, error: profilesError } = await supabase
-      .from("profiles")
-      .select("id, name, email, avatar_url")
-      .in("id", userIds);
-
-    if (profilesError) {
-      setError(profilesError.message);
-      setLoading(false);
-      return;
-    }
-
-    const profiles = (profileRows || []) as Profile[];
-
-    const formattedMembers: Member[] = memberRows.map((member) => {
-      const profile = profiles.find(
-        (profileRow) => profileRow.id === member.user_id,
-      );
-
-      return {
-        id: member.id,
-        user_id: member.user_id,
-        role: member.role,
-        member_since: member.member_since,
-        member_since_year: member.member_since_year,
-        name: profile?.name || "Unknown member",
-        email: profile?.email || "",
-        avatar_url: profile?.avatar_url || null,
-      };
-    });
-
-    setMembers(formattedMembers);
-    setLoading(false);
-  }
-
-  async function addMember(event: React.FormEvent) {
-    event.preventDefault();
-
-    if (!team) return;
-
-    setAdding(true);
-    setError("");
-
-    const normalizedEmail = email.trim().toLowerCase();
-
-    if (!normalizedEmail) {
-      setError("Please enter an email address.");
-      setAdding(false);
-      return;
-    }
-
-    const { data: profile, error: profileError } = await supabase
-      .from("profiles")
-      .select("id, name, email, avatar_url")
-      .eq("email", normalizedEmail)
-      .maybeSingle();
-
-    if (profileError) {
-      setError(profileError.message);
-      setAdding(false);
-      return;
-    }
-
-    if (!profile) {
-      setError(
-        "No FullOut account exists with this email. They need to sign up first.",
-      );
-      setAdding(false);
-      return;
-    }
-
-    const { error: insertError } = await supabase.from("team_members").insert({
-      team_id: team.id,
-      user_id: profile.id,
-      role,
-      member_since: memberSince,
-      member_since_year: Number(memberSinceYear),
-    });
-
-    if (insertError) {
-      if (insertError.code === "23505") {
-        setError("This person is already a member of this team.");
-      } else {
-        setError(insertError.message);
+      if (userError) {
+        throw userError;
       }
 
-      setAdding(false);
+      if (!user) {
+        setError("You must be logged in to view members.");
+        return;
+      }
+
+      setUserId(user.id);
+
+      const storedTeamId = window.localStorage.getItem("fullout_active_team");
+
+      if (!storedTeamId) {
+        setError("No active team selected.");
+        return;
+      }
+
+      const { data: team, error: teamError } = await supabase
+        .from("teams")
+        .select("id, name, invite_code")
+        .eq("id", storedTeamId)
+        .single();
+
+      if (teamError) {
+        throw teamError;
+      }
+
+      setActiveTeam(team);
+
+      const { data: membershipRows, error: membershipError } = await supabase
+        .from("team_members")
+        .select("id, team_id, user_id, role, member_since, member_since_year")
+        .eq("team_id", storedTeamId);
+
+      if (membershipError) {
+        throw membershipError;
+      }
+
+      const memberRows = membershipRows ?? [];
+
+      const memberUserIds = memberRows.map((member) => member.user_id);
+
+      let profileRows: Profile[] = [];
+
+      if (memberUserIds.length > 0) {
+        const { data: profiles, error: profileError } = await supabase
+          .from("profiles")
+          .select("id, name, email, avatar_url")
+          .in("id", memberUserIds);
+
+        if (profileError) {
+          throw profileError;
+        }
+
+        profileRows = profiles ?? [];
+      }
+
+      const profileMap = new Map(
+        profileRows.map((profile) => [profile.id, profile]),
+      );
+
+      const loadedMembers: Member[] = memberRows.map((membership) => ({
+        ...membership,
+        profile: profileMap.get(membership.user_id) ?? null,
+      }));
+
+      loadedMembers.sort((a, b) => {
+        if (a.user_id === user.id) return -1;
+        if (b.user_id === user.id) return 1;
+
+        return (a.profile?.name ?? a.profile?.email ?? "").localeCompare(
+          b.profile?.name ?? b.profile?.email ?? "",
+        );
+      });
+
+      setMembers(loadedMembers);
+
+      const myMembership = memberRows.find(
+        (member) => member.user_id === user.id,
+      );
+
+      setCurrentRole(myMembership?.role ?? null);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Something went wrong while loading members.",
+      );
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const isDirector = currentRole === "director";
+
+  async function changeRole(member: Member, newRole: string) {
+    if (!activeTeam || !isDirector) return;
+
+    if (member.user_id === userId) {
+      setError("You cannot change your own role.");
       return;
     }
 
-    setName("");
-    setEmail("");
-    setRole("dancer");
-    setMemberSince("Fall");
-    setMemberSinceYear(new Date().getFullYear().toString());
-    setShowModal(false);
-    setAdding(false);
+    if (member.role === newRole) return;
 
-    await loadMembers();
+    setActionLoading(member.id);
+    setError("");
+    setSuccess("");
+
+    try {
+      const { error: updateError } = await supabase
+        .from("team_members")
+        .update({
+          role: newRole,
+        })
+        .eq("id", member.id)
+        .eq("team_id", activeTeam.id);
+
+      if (updateError) {
+        throw updateError;
+      }
+
+      setMembers((currentMembers) =>
+        currentMembers.map((currentMember) =>
+          currentMember.id === member.id
+            ? {
+                ...currentMember,
+                role: newRole,
+              }
+            : currentMember,
+        ),
+      );
+
+      setSuccess(
+        `${member.profile?.name ?? "Member"} is now a ${formatRole(newRole)}.`,
+      );
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Unable to update member role.",
+      );
+    } finally {
+      setActionLoading(null);
+    }
   }
 
-  function getInitials(memberName: string) {
-    return memberName
-      .split(" ")
-      .filter(Boolean)
-      .slice(0, 2)
-      .map((part) => part[0])
-      .join("")
-      .toUpperCase();
+  async function removeMember(member: Member) {
+    if (!activeTeam || !isDirector) return;
+
+    if (member.user_id === userId) {
+      setError("You cannot remove yourself from the team.");
+      return;
+    }
+
+    const memberName =
+      member.profile?.name ?? member.profile?.email ?? "this member";
+
+    const confirmed = window.confirm(
+      `Remove ${memberName} from ${activeTeam.name}?\n\nThey will no longer have access to this team.`,
+    );
+
+    if (!confirmed) return;
+
+    setActionLoading(member.id);
+    setError("");
+    setSuccess("");
+
+    try {
+      const { error: deleteError } = await supabase
+        .from("team_members")
+        .delete()
+        .eq("id", member.id)
+        .eq("team_id", activeTeam.id);
+
+      if (deleteError) {
+        throw deleteError;
+      }
+
+      setMembers((currentMembers) =>
+        currentMembers.filter(
+          (currentMember) => currentMember.id !== member.id,
+        ),
+      );
+
+      setSuccess(`${memberName} was removed from the team.`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unable to remove member.");
+    } finally {
+      setActionLoading(null);
+    }
   }
 
-  function formatRole(value: string) {
-    return value.charAt(0).toUpperCase() + value.slice(1);
+  async function copyInviteCode() {
+    if (!activeTeam?.invite_code) return;
+
+    try {
+      await navigator.clipboard.writeText(activeTeam.invite_code);
+
+      setCopied(true);
+      setSuccess("Invite code copied.");
+
+      window.setTimeout(() => {
+        setCopied(false);
+      }, 2000);
+    } catch {
+      setError("Unable to copy the invite code.");
+    }
   }
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-gray-50">
-        <div className="mx-auto max-w-6xl px-6 py-10">
-          <div className="animate-pulse space-y-5">
-            <div className="h-8 w-32 rounded bg-gray-200" />
-            <div className="h-6 w-48 rounded bg-gray-200" />
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              <div className="h-40 rounded-2xl bg-gray-200" />
-              <div className="h-40 rounded-2xl bg-gray-200" />
-              <div className="h-40 rounded-2xl bg-gray-200" />
-            </div>
+      <main className="min-h-screen bg-white px-6 py-10 text-slate-900">
+        <div className="mx-auto max-w-6xl">
+          <div className="animate-pulse space-y-6">
+            <div className="h-8 w-40 rounded bg-slate-200" />
+            <div className="h-24 rounded-2xl bg-slate-100" />
+            <div className="h-20 rounded-2xl bg-slate-100" />
+            <div className="h-20 rounded-2xl bg-slate-100" />
+            <div className="h-20 rounded-2xl bg-slate-100" />
           </div>
         </div>
       </main>
@@ -288,232 +346,212 @@ export default function MembersPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <nav className="border-b border-gray-200 bg-white">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <Link href="/dashboard" className="text-xl font-bold text-gray-900">
-            FullOut
+    <main className="min-h-screen bg-white px-6 py-8 text-slate-900">
+      <div className="mx-auto max-w-6xl">
+        {/* Header */}
+        <div className="mb-8">
+          <Link
+            href="/dashboard"
+            className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-slate-500 transition hover:text-slate-900"
+          >
+            <span>←</span>
+            Back to dashboard
           </Link>
 
-          <div className="flex items-center gap-5 text-sm">
-            <Link
-              href="/dashboard"
-              className="text-gray-600 hover:text-gray-900"
-            >
-              Dashboard
-            </Link>
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="mb-1 text-sm font-medium text-slate-500">
+                {activeTeam?.name ?? "Team"}
+              </p>
 
-            <Link href="/members" className="font-medium text-gray-900">
-              Members
-            </Link>
+              <h1 className="text-3xl font-semibold tracking-tight">Members</h1>
 
-            <Link href="/sets" className="text-gray-600 hover:text-gray-900">
-              Sets
-            </Link>
+              <p className="mt-2 text-sm text-slate-500">
+                Manage your team roster and roles.
+              </p>
+            </div>
+
+            <div className="text-sm text-slate-500">
+              {members.length} {members.length === 1 ? "member" : "members"}
+            </div>
           </div>
         </div>
-      </nav>
 
-      <div className="mx-auto max-w-6xl px-6 py-10">
-        <Link
-          href="/dashboard"
-          className="text-sm text-gray-500 hover:text-gray-900"
-        >
-          ← Dashboard
-        </Link>
-
-        <div className="mt-6 flex items-end justify-between gap-4">
-          <div>
-            <p className="text-sm text-gray-500">{team?.name}</p>
-            <h1 className="mt-1 text-3xl font-bold text-gray-900">Members</h1>
-          </div>
-
-          <button
-            onClick={() => setShowModal(true)}
-            className="rounded-lg bg-black px-4 py-2.5 text-sm font-medium text-white hover:bg-gray-800"
-          >
-            + Add member
-          </button>
-        </div>
-
+        {/* Messages */}
         {error && (
-          <div className="mt-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          <div className="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
             {error}
           </div>
         )}
 
-        {members.length === 0 ? (
-          <div className="mt-8 rounded-2xl border border-gray-200 bg-white p-10 text-center">
-            <h2 className="text-lg font-semibold text-gray-900">
-              No members yet
-            </h2>
-
-            <p className="mt-2 text-sm text-gray-500">
-              Add your first team member to get started.
-            </p>
-          </div>
-        ) : (
-          <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {members.map((member) => (
-              <div
-                key={member.id}
-                className="rounded-2xl border border-gray-200 bg-white p-5"
-              >
-                <div className="flex items-center gap-4">
-                  {member.avatar_url ? (
-                    <img
-                      src={member.avatar_url}
-                      alt=""
-                      className="h-12 w-12 rounded-full object-cover"
-                    />
-                  ) : (
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 text-sm font-semibold text-gray-700">
-                      {getInitials(member.name)}
-                    </div>
-                  )}
-
-                  <div className="min-w-0">
-                    <h2 className="truncate font-semibold text-gray-900">
-                      {member.name}
-                    </h2>
-
-                    {member.email && (
-                      <p className="truncate text-sm text-gray-500">
-                        {member.email}
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                <div className="mt-5 flex items-center justify-between">
-                  <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700">
-                    {formatRole(member.role)}
-                  </span>
-
-                  {member.member_since && member.member_since_year && (
-                    <span className="text-xs text-gray-500">
-                      Member Since {member.member_since}{" "}
-                      {member.member_since_year}
-                    </span>
-                  )}
-                </div>
-              </div>
-            ))}
+        {success && (
+          <div className="mb-6 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+            {success}
           </div>
         )}
-      </div>
 
-      {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold text-gray-900">
-                Add member
-              </h2>
-
-              <button
-                onClick={() => setShowModal(false)}
-                className="text-gray-400 hover:text-gray-700"
-              >
-                ✕
-              </button>
-            </div>
-
-            <form onSubmit={addMember} className="mt-6 space-y-4">
+        {/* Invite Card */}
+        {activeTeam?.invite_code && (
+          <section className="mb-8 rounded-2xl border border-slate-200 bg-slate-50 p-5">
+            <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">
-                  Name
-                </label>
+                <h2 className="text-base font-semibold">Invite members</h2>
 
-                <input
-                  value={name}
-                  onChange={(event) => setName(event.target.value)}
-                  placeholder="Member name"
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-black"
-                />
-              </div>
-
-              <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">
-                  Email
-                </label>
-
-                <input
-                  required
-                  type="email"
-                  value={email}
-                  onChange={(event) => setEmail(event.target.value)}
-                  placeholder="member@email.com"
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-black"
-                />
-
-                <p className="mt-1 text-xs text-gray-500">
-                  The person must already have a FullOut account.
+                <p className="mt-1 text-sm text-slate-500">
+                  Share this code with dancers who want to join{" "}
+                  {activeTeam.name}.
                 </p>
               </div>
 
-              <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">
-                  Role
-                </label>
+              <div className="flex items-center gap-3">
+                <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 font-mono text-lg font-semibold tracking-[0.18em] text-slate-900">
+                  {activeTeam.invite_code}
+                </div>
 
-                <select
-                  value={role}
-                  onChange={(event) => setRole(event.target.value)}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-black"
+                <button
+                  type="button"
+                  onClick={copyInviteCode}
+                  className="rounded-xl bg-slate-900 px-4 py-3 text-sm font-medium text-white transition hover:bg-slate-800"
                 >
-                  {roles.map((item) => (
-                    <option key={item} value={item}>
-                      {formatRole(item)}
-                    </option>
-                  ))}
-                </select>
+                  {copied ? "Copied" : "Copy"}
+                </button>
               </div>
+            </div>
+          </section>
+        )}
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="mb-1 block text-sm font-medium text-gray-700">
-                    Member since
-                  </label>
+        {/* Roster */}
+        <section>
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-lg font-semibold">Team roster</h2>
 
-                  <select
-                    value={memberSince}
-                    onChange={(event) => setMemberSince(event.target.value)}
-                    className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-black"
-                  >
-                    {seasons.map((season) => (
-                      <option key={season} value={season}>
-                        {season}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="mb-1 block text-sm font-medium text-gray-700">
-                    Year
-                  </label>
-
-                  <input
-                    type="number"
-                    value={memberSinceYear}
-                    onChange={(event) => setMemberSinceYear(event.target.value)}
-                    className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-black"
-                  />
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                disabled={adding}
-                className="w-full rounded-lg bg-black px-4 py-3 text-sm font-medium text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                {adding ? "Adding..." : "Add member"}
-              </button>
-            </form>
+            {isDirector && (
+              <span className="text-xs font-medium text-slate-400">
+                Director controls enabled
+              </span>
+            )}
           </div>
-        </div>
-      )}
+
+          {members.length === 0 ? (
+            <div className="rounded-2xl border border-dashed border-slate-300 px-6 py-12 text-center">
+              <h3 className="font-medium text-slate-900">No members yet</h3>
+
+              <p className="mt-2 text-sm text-slate-500">
+                Share your invite code to start building the team.
+              </p>
+            </div>
+          ) : (
+            <div className="overflow-hidden rounded-2xl border border-slate-200">
+              <div className="divide-y divide-slate-200">
+                {members.map((member) => {
+                  const name =
+                    member.profile?.name ||
+                    member.profile?.email ||
+                    "Unnamed member";
+
+                  const email = member.profile?.email ?? "";
+
+                  const isCurrentUser = member.user_id === userId;
+
+                  const isBusy = actionLoading === member.id;
+
+                  return (
+                    <div
+                      key={member.id}
+                      className="flex flex-col gap-4 px-5 py-5 sm:flex-row sm:items-center sm:justify-between"
+                    >
+                      {/* Member info */}
+                      <div className="flex min-w-0 items-center gap-4">
+                        {member.profile?.avatar_url ? (
+                          <img
+                            src={member.profile.avatar_url}
+                            alt=""
+                            className="h-11 w-11 rounded-full object-cover"
+                          />
+                        ) : (
+                          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-slate-100 text-sm font-semibold text-slate-600">
+                            {getInitials(name, email)}
+                          </div>
+                        )}
+
+                        <div className="min-w-0">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <p className="truncate font-medium text-slate-900">
+                              {name}
+                            </p>
+
+                            {isCurrentUser && (
+                              <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-500">
+                                You
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-500">
+                            <span>{formatRole(member.role)}</span>
+
+                            <span className="text-slate-300">•</span>
+
+                            <span>
+                              {formatMemberSince(
+                                member.member_since,
+                                member.member_since_year,
+                              )}
+                            </span>
+                          </div>
+
+                          {email && (
+                            <p className="mt-1 truncate text-xs text-slate-400">
+                              {email}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Controls */}
+                      {isDirector && !isCurrentUser ? (
+                        <div className="flex flex-wrap items-center gap-2 sm:justify-end">
+                          <select
+                            value={member.role}
+                            disabled={isBusy}
+                            onChange={(event) =>
+                              changeRole(member, event.target.value)
+                            }
+                            className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 outline-none transition focus:border-slate-400 disabled:cursor-not-allowed disabled:opacity-50"
+                            aria-label={`Change role for ${name}`}
+                          >
+                            {ROLE_OPTIONS.map((role) => (
+                              <option key={role} value={role}>
+                                {ROLE_LABELS[role]}
+                              </option>
+                            ))}
+                          </select>
+
+                          <button
+                            type="button"
+                            disabled={isBusy}
+                            onClick={() => removeMember(member)}
+                            className="rounded-xl border border-red-200 px-3 py-2 text-sm font-medium text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
+                          >
+                            {isBusy ? "Saving..." : "Remove"}
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="flex items-center">
+                          <span className="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-600">
+                            {ROLE_DESCRIPTIONS[member.role] ??
+                              formatRole(member.role)}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </section>
+      </div>
     </main>
   );
 }

@@ -556,6 +556,18 @@ export default function DashboardPage() {
             >
               View corrections
             </Link>
+            <Link
+              href="/attendance"
+              className="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium transition hover:border-black"
+            >
+              Attendance
+            </Link>
+            <Link
+              href="/calendar"
+              className="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium transition hover:border-black"
+            >
+              Calendar
+            </Link>
           </div>
         </section>
       </div>
