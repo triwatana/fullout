@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import AppNav from "@/app/components/AppNav";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
@@ -347,17 +347,10 @@ export default function MembersPage() {
 
   return (
     <main className="min-h-screen bg-white px-6 py-8 text-slate-900">
+      <AppNav />
       <div className="mx-auto max-w-6xl">
         {/* Header */}
         <div className="mb-8">
-          <Link
-            href="/dashboard"
-            className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-slate-500 transition hover:text-slate-900"
-          >
-            <span>←</span>
-            Back to dashboard
-          </Link>
-
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="mb-1 text-sm font-medium text-slate-500">

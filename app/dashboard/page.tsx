@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import AppNav from "@/app/components/AppNav";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
@@ -322,17 +323,14 @@ export default function DashboardPage() {
 
   return (
     <main className="min-h-screen bg-white text-black">
-      <div className="mx-auto max-w-6xl px-6 py-8">
+      <div className="mx-auto max-w-6xl px-6 py-6">
+        <AppNav />
         {/* Header */}
-        <header className="flex flex-col justify-between gap-5 sm:flex-row sm:items-center">
+        <header className="mt-6 flex flex-col justify-between gap-5 sm:flex-row sm:items-center">
+          {" "}
           <div>
-            <p className="text-sm text-gray-500">FullOut</p>
-
-            <h1 className="mt-1 text-3xl font-semibold tracking-tight">
-              Dashboard
-            </h1>
+            <h1 className="text-3xl font-semibold tracking-tight">Dashboard</h1>
           </div>
-
           {teams.length > 1 && (
             <div>
               <label className="sr-only">Active team</label>
@@ -375,39 +373,34 @@ export default function DashboardPage() {
 
         {/* Stats */}
         <section className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <Link
-            href="/members"
-            className="rounded-xl border border-gray-200 p-5 transition hover:border-gray-400"
-          >
+          <div className="rounded-xl border border-gray-200 p-5">
             <p className="text-sm text-gray-500">Team</p>
 
-            <p className="mt-1 text-2xl font-semibold">Members</p>
+            <p className="mt-2 text-2xl font-semibold">{activeTeam.name}</p>
 
-            <p className="mt-2 text-sm text-gray-500">View your team</p>
-          </Link>
+            <p className="mt-2 text-sm text-gray-500 capitalize">
+              {activeMembership?.role ?? "Member"}
+            </p>
+          </div>
 
-          <Link
-            href="/sets"
-            className="rounded-xl border border-gray-200 p-5 transition hover:border-gray-400"
-          >
+          <div className="rounded-xl border border-gray-200 p-5">
             <p className="text-sm text-gray-500">Sets</p>
 
-            <p className="mt-1 text-2xl font-semibold">{sets.length}</p>
+            <p className="mt-2 text-2xl font-semibold">{sets.length}</p>
 
-            <p className="mt-2 text-sm text-gray-500">View choreography</p>
-          </Link>
+            <p className="mt-2 text-sm text-gray-500">
+              {sets.length === 1 ? "Set in your team" : "Sets in your team"}
+            </p>
+          </div>
 
-          <Link
-            href="/corrections"
-            className={`rounded-xl border p-5 transition ${
-              openCorrections.length > 0
-                ? "border-black"
-                : "border-gray-200 hover:border-gray-400"
+          <div
+            className={`rounded-xl border p-5 ${
+              openCorrections.length > 0 ? "border-black" : "border-gray-200"
             }`}
           >
-            <p className="text-sm text-gray-500">Corrections</p>
+            <p className="text-sm text-gray-500">Open corrections</p>
 
-            <p className="mt-1 text-2xl font-semibold">
+            <p className="mt-2 text-2xl font-semibold">
               {openCorrections.length}
             </p>
 
@@ -415,10 +408,10 @@ export default function DashboardPage() {
               {openCorrections.length === 0
                 ? "You're all caught up"
                 : openCorrections.length === 1
-                  ? "1 open correction"
-                  : "Open corrections"}
+                  ? "Needs attention"
+                  : "Need attention"}
             </p>
-          </Link>
+          </div>
         </section>
 
         {/* Corrections */}
@@ -529,46 +522,6 @@ export default function DashboardPage() {
               </Link>
             </div>
           )}
-        </section>
-
-        {/* Quick actions */}
-        <section className="mt-10">
-          <h2 className="text-xl font-semibold">Quick actions</h2>
-
-          <div className="mt-4 flex flex-wrap gap-3">
-            <Link
-              href="/sets"
-              className="rounded-lg bg-black px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800"
-            >
-              View sets
-            </Link>
-
-            <Link
-              href="/members"
-              className="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium transition hover:border-black"
-            >
-              View members
-            </Link>
-
-            <Link
-              href="/corrections"
-              className="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium transition hover:border-black"
-            >
-              View corrections
-            </Link>
-            <Link
-              href="/attendance"
-              className="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium transition hover:border-black"
-            >
-              Attendance
-            </Link>
-            <Link
-              href="/calendar"
-              className="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium transition hover:border-black"
-            >
-              Calendar
-            </Link>
-          </div>
         </section>
       </div>
     </main>

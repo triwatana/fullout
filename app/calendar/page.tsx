@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import AppNav from "@/app/components/AppNav";
 import { createClient } from "@/lib/supabase/client";
 
 type Team = {
@@ -476,16 +477,10 @@ export default function CalendarPage() {
 
   return (
     <main className="min-h-screen bg-white text-black">
+      <AppNav />
       <div className="mx-auto max-w-6xl px-6 py-8">
         <header className="flex flex-col justify-between gap-5 sm:flex-row sm:items-center">
           <div>
-            <Link
-              href="/dashboard"
-              className="text-sm text-gray-500 hover:text-black"
-            >
-              ← Dashboard
-            </Link>
-
             <h1 className="mt-2 text-3xl font-semibold tracking-tight">
               Calendar
             </h1>

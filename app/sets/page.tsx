@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
+import AppNav from "@/app/components/AppNav";
 
 type Team = {
   id: string;
@@ -213,39 +214,8 @@ export default function SetsPage() {
 
   return (
     <main className="min-h-screen bg-gray-50">
-      <nav className="border-b border-gray-200 bg-white">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <Link href="/dashboard" className="text-xl font-bold text-gray-900">
-            FullOut
-          </Link>
-
-          <div className="flex items-center gap-5 text-sm">
-            <Link
-              href="/dashboard"
-              className="text-gray-600 hover:text-gray-900"
-            >
-              Dashboard
-            </Link>
-
-            <Link href="/members" className="text-gray-600 hover:text-gray-900">
-              Members
-            </Link>
-
-            <Link href="/sets" className="font-medium text-gray-900">
-              Sets
-            </Link>
-          </div>
-        </div>
-      </nav>
-
+      <AppNav />
       <div className="mx-auto max-w-6xl px-6 py-10">
-        <Link
-          href="/dashboard"
-          className="text-sm text-gray-500 hover:text-gray-900"
-        >
-          ← Dashboard
-        </Link>
-
         <div className="mt-6 flex items-end justify-between gap-4">
           <div>
             <p className="text-sm text-gray-500">{team?.name}</p>

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import AppNav from "@/app/components/AppNav";
 
 type Team = {
   id: string;
@@ -476,6 +477,7 @@ export default function SetPage() {
   if (!setData || !team) {
     return (
       <main className="min-h-screen bg-white">
+        <AppNav />
         <div className="mx-auto max-w-6xl px-6 py-10">
           <Link href="/sets" className="text-sm text-gray-500 hover:text-black">
             ← Back to Sets

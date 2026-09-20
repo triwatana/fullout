@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import AppNav from "@/app/components/AppNav";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
@@ -346,6 +347,7 @@ export default function CorrectionsPage() {
   if (loading) {
     return (
       <main className="min-h-screen bg-white text-black">
+        <AppNav />
         <div className="mx-auto max-w-6xl px-6 py-10">
           <p className="text-sm text-gray-500">Loading corrections...</p>
         </div>
@@ -358,13 +360,6 @@ export default function CorrectionsPage() {
       <main className="min-h-screen bg-white text-black">
         <div className="mx-auto max-w-6xl px-6 py-10">
           <p className="text-sm text-gray-500">{error || "Team not found."}</p>
-
-          <Link
-            href="/dashboard"
-            className="mt-4 inline-block text-sm font-medium hover:underline"
-          >
-            ← Back to Dashboard
-          </Link>
         </div>
       </main>
     );
@@ -372,17 +367,11 @@ export default function CorrectionsPage() {
 
   return (
     <main className="min-h-screen bg-white text-black">
+      <AppNav />
       <div className="mx-auto max-w-6xl px-6 py-8">
         {/* Header */}
         <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
           <div>
-            <Link
-              href="/dashboard"
-              className="text-sm text-gray-500 transition hover:text-black"
-            >
-              ← Dashboard
-            </Link>
-
             <p className="mt-6 text-sm font-medium text-gray-500">
               {team.name}
             </p>
