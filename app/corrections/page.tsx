@@ -346,9 +346,9 @@ export default function CorrectionsPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-white text-black">
+      <main className="min-h-screen bg-white text-[#111111]">
         <AppNav />
-        <div className="mx-auto max-w-6xl px-6 py-10">
+        <div className="mx-auto max-w-6xl px-6 py-8">
           <p className="text-sm text-gray-500">Loading corrections...</p>
         </div>
       </main>
@@ -357,8 +357,8 @@ export default function CorrectionsPage() {
 
   if (!team) {
     return (
-      <main className="min-h-screen bg-white text-black">
-        <div className="mx-auto max-w-6xl px-6 py-10">
+      <main className="min-h-screen bg-white text-[#111111]">
+        <div className="mx-auto max-w-6xl px-6 py-8">
           <p className="text-sm text-gray-500">{error || "Team not found."}</p>
         </div>
       </main>
@@ -366,7 +366,7 @@ export default function CorrectionsPage() {
   }
 
   return (
-    <main className="min-h-screen bg-white text-black">
+    <main className="min-h-screen bg-white text-[#111111]">
       <AppNav />
       <div className="mx-auto max-w-6xl px-6 py-8">
         {/* Header */}
@@ -401,7 +401,7 @@ export default function CorrectionsPage() {
             onClick={() => setFilter("open")}
             className={`rounded-xl border p-5 text-left transition ${
               filter === "open"
-                ? "border-black"
+                ? "border-[#2563EB]"
                 : "border-gray-200 hover:border-gray-400"
             }`}
           >
@@ -414,7 +414,7 @@ export default function CorrectionsPage() {
             onClick={() => setFilter("resolved")}
             className={`rounded-xl border p-5 text-left transition ${
               filter === "resolved"
-                ? "border-black"
+                ? "border-[#2563EB]"
                 : "border-gray-200 hover:border-gray-400"
             }`}
           >
@@ -427,7 +427,7 @@ export default function CorrectionsPage() {
             onClick={() => setFilter("all")}
             className={`rounded-xl border p-5 text-left transition ${
               filter === "all"
-                ? "border-black"
+                ? "border-[#2563EB]"
                 : "border-gray-200 hover:border-gray-400"
             }`}
           >
@@ -451,8 +451,8 @@ export default function CorrectionsPage() {
               }
               className={`border-b-2 px-4 py-3 text-sm font-medium transition ${
                 filter === item.value
-                  ? "border-black text-black"
-                  : "border-transparent text-gray-500 hover:text-black"
+                  ? "border-[#2563EB] text-[#111111]"
+                  : "border-transparent text-gray-500 hover:text-[#1D4ED8]"
               }`}
             >
               {item.label}
@@ -483,7 +483,7 @@ export default function CorrectionsPage() {
               {isLeader && filter !== "resolved" && (
                 <Link
                   href="/sets"
-                  className="mt-5 inline-flex rounded-lg bg-black px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800"
+                  className="mt-5 inline-flex rounded-full bg-[#2563EB] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#1D4ED8]"
                 >
                   Go to Sets
                 </Link>
@@ -508,7 +508,7 @@ export default function CorrectionsPage() {
                   key={correction.id}
                   className={`rounded-xl border p-5 transition ${
                     correction.resolved
-                      ? "border-gray-200 bg-gray-50"
+                      ? "border-gray-200 bg-white"
                       : "border-gray-200 bg-white"
                   }`}
                 >
@@ -537,11 +537,11 @@ export default function CorrectionsPage() {
                         </span>
 
                         {correction.resolved ? (
-                          <span className="rounded-full bg-gray-200 px-2.5 py-1 text-xs font-medium text-gray-500">
+                          <span className="rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-500">
                             Resolved
                           </span>
                         ) : (
-                          <span className="rounded-full bg-black px-2.5 py-1 text-xs font-medium text-white">
+                          <span className="rounded-full bg-[#2563EB] px-2.5 py-1 text-xs font-medium text-white">
                             Open
                           </span>
                         )}
@@ -578,14 +578,14 @@ export default function CorrectionsPage() {
                         href={video.video_url}
                         target="_blank"
                         rel="noreferrer"
-                        className="rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium transition hover:border-black hover:bg-gray-50"
+                        className="rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium transition hover:border-[#2563EB] hover:bg-white"
                       >
                         Open video
                       </a>
 
                       <Link
                         href={`/sets/${set.id}`}
-                        className="rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium transition hover:border-black hover:bg-gray-50"
+                        className="rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium transition hover:border-[#2563EB] hover:bg-white"
                       >
                         Open set
                       </Link>
@@ -594,7 +594,7 @@ export default function CorrectionsPage() {
                         <button
                           type="button"
                           onClick={() => toggleCorrection(correction)}
-                          className="rounded-lg bg-black px-3 py-2 text-sm font-medium text-white transition hover:bg-gray-800"
+                          className="rounded-full bg-[#2563EB] px-3 py-2 text-sm font-medium text-white transition hover:bg-[#1D4ED8]"
                         >
                           {correction.resolved ? "Reopen" : "Mark resolved"}
                         </button>

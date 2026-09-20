@@ -195,16 +195,16 @@ export default function SetsPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-gray-50">
-        <div className="mx-auto max-w-6xl px-6 py-10">
+      <main className="min-h-screen bg-white text-[#111111]">
+        <div className="mx-auto max-w-6xl px-6 py-8">
           <div className="animate-pulse space-y-5">
-            <div className="h-8 w-32 rounded bg-gray-200" />
-            <div className="h-6 w-48 rounded bg-gray-200" />
+            <div className="h-8 w-32 rounded bg-gray-100" />
+            <div className="h-6 w-48 rounded bg-gray-100" />
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              <div className="h-48 rounded-2xl bg-gray-200" />
-              <div className="h-48 rounded-2xl bg-gray-200" />
-              <div className="h-48 rounded-2xl bg-gray-200" />
+              <div className="h-48 rounded-xl bg-gray-100" />
+              <div className="h-48 rounded-xl bg-gray-100" />
+              <div className="h-48 rounded-xl bg-gray-100" />
             </div>
           </div>
         </div>
@@ -213,20 +213,22 @@ export default function SetsPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-white text-[#111111]">
       <AppNav />
-      <div className="mx-auto max-w-6xl px-6 py-10">
+      <div className="mx-auto max-w-6xl px-6 py-8">
         <div className="mt-6 flex items-end justify-between gap-4">
           <div>
             <p className="text-sm text-gray-500">{team?.name}</p>
 
-            <h1 className="mt-1 text-3xl font-bold text-gray-900">Sets</h1>
+            <h1 className="mt-1 text-3xl font-semibold tracking-tight text-[#111111]">
+              Sets
+            </h1>
           </div>
 
           {canCreateSet && (
             <button
               onClick={() => setShowModal(true)}
-              className="rounded-lg bg-black px-4 py-2.5 text-sm font-medium text-white hover:bg-gray-800"
+              className="rounded-full bg-[#2563EB] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#1D4ED8]"
             >
               + Create set
             </button>
@@ -240,7 +242,7 @@ export default function SetsPage() {
         )}
 
         {sets.length === 0 ? (
-          <div className="mt-8 rounded-2xl border border-gray-200 bg-white p-10 text-center">
+          <div className="mt-8 rounded-xl border border-gray-200 bg-white p-10 text-center">
             <h2 className="text-lg font-semibold text-gray-900">No sets yet</h2>
 
             <p className="mt-2 text-sm text-gray-500">
@@ -252,7 +254,7 @@ export default function SetsPage() {
             {canCreateSet && (
               <button
                 onClick={() => setShowModal(true)}
-                className="mt-5 rounded-lg bg-black px-4 py-2.5 text-sm font-medium text-white hover:bg-gray-800"
+                className="mt-5 rounded-full bg-[#2563EB] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#1D4ED8]"
               >
                 Create your first set
               </button>
@@ -269,7 +271,7 @@ export default function SetsPage() {
                 <Link
                   key={set.id}
                   href={`/sets/${set.id}`}
-                  className="rounded-2xl border border-gray-200 bg-white p-6 transition hover:border-gray-400 hover:shadow-sm"
+                  className="rounded-xl border border-gray-200 bg-white p-6 transition hover:-translate-y-0.5 hover:border-[#2563EB] hover:shadow-sm"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <h3 className="text-lg font-semibold text-gray-900">
@@ -301,7 +303,7 @@ export default function SetsPage() {
 
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+          <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl">
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-semibold text-gray-900">
                 Create set
@@ -326,7 +328,7 @@ export default function SetsPage() {
                   value={name}
                   onChange={(event) => setName(event.target.value)}
                   placeholder="e.g. Fall 2026 Set"
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-black"
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-blue-100"
                 />
               </div>
 
@@ -340,7 +342,7 @@ export default function SetsPage() {
                   onChange={(event) => setDescription(event.target.value)}
                   placeholder="Optional description"
                   rows={3}
-                  className="w-full resize-none rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-black"
+                  className="w-full resize-none rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-blue-100"
                 />
               </div>
 
@@ -353,7 +355,7 @@ export default function SetsPage() {
                   <select
                     value={season}
                     onChange={(event) => setSeason(event.target.value)}
-                    className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-black"
+                    className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-blue-100"
                   >
                     {seasons.map((item) => (
                       <option key={item} value={item}>
@@ -373,7 +375,7 @@ export default function SetsPage() {
                     type="number"
                     value={seasonYear}
                     onChange={(event) => setSeasonYear(event.target.value)}
-                    className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-black"
+                    className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-blue-100"
                   />
                 </div>
               </div>
@@ -381,7 +383,7 @@ export default function SetsPage() {
               <button
                 type="submit"
                 disabled={creating || !name.trim()}
-                className="w-full rounded-lg bg-black px-4 py-3 text-sm font-medium text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
+                className="w-full rounded-full bg-[#2563EB] px-4 py-3 text-sm font-medium text-white hover:bg-[#1D4ED8] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {creating ? "Creating..." : "Create set"}
               </button>

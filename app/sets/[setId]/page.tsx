@@ -466,8 +466,8 @@ export default function SetPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-white">
-        <div className="mx-auto max-w-6xl px-6 py-10">
+      <main className="min-h-screen bg-white text-[#111111]">
+        <div className="mx-auto max-w-6xl px-6 py-8">
           <p className="text-sm text-gray-500">Loading set...</p>
         </div>
       </main>
@@ -476,10 +476,10 @@ export default function SetPage() {
 
   if (!setData || !team) {
     return (
-      <main className="min-h-screen bg-white">
+      <main className="min-h-screen bg-white text-[#111111]">
         <AppNav />
-        <div className="mx-auto max-w-6xl px-6 py-10">
-          <Link href="/sets" className="text-sm text-gray-500 hover:text-black">
+        <div className="mx-auto max-w-6xl px-6 py-8">
+          <Link href="/sets" className="text-sm text-gray-500 hover:text-[#1D4ED8]">
             ← Back to Sets
           </Link>
 
@@ -492,12 +492,12 @@ export default function SetPage() {
   }
 
   return (
-    <main className="min-h-screen bg-white text-black">
+    <main className="min-h-screen bg-white text-[#111111]">
       <div className="mx-auto max-w-6xl px-6 py-8">
         {/* Back navigation */}
         <Link
           href="/sets"
-          className="text-sm text-gray-500 transition hover:text-black"
+          className="text-sm text-gray-500 transition hover:text-[#1D4ED8]"
         >
           ← Back to Sets
         </Link>
@@ -551,7 +551,7 @@ export default function SetPage() {
                   setQueryError("");
                   setShowVideoModal(true);
                 }}
-                className="shrink-0 rounded-lg bg-black px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800"
+                className="shrink-0 rounded-full bg-[#2563EB] px-4 py-2 text-sm font-medium text-white transition hover:bg-[#1D4ED8]"
               >
                 + Add video
               </button>
@@ -607,7 +607,7 @@ export default function SetPage() {
                           href={video.video_url}
                           target="_blank"
                           rel="noreferrer"
-                          className="rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium transition hover:border-black hover:bg-gray-50"
+                          className="rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium transition hover:border-[#2563EB] hover:bg-white"
                         >
                           Open video
                         </a>
@@ -616,7 +616,7 @@ export default function SetPage() {
                           <button
                             type="button"
                             onClick={() => openCorrectionModal(video)}
-                            className="rounded-lg bg-black px-3 py-2 text-sm font-medium text-white transition hover:bg-gray-800"
+                            className="rounded-full bg-[#2563EB] px-3 py-2 text-sm font-medium text-white transition hover:bg-[#1D4ED8]"
                           >
                             + Correction
                           </button>
@@ -650,7 +650,7 @@ export default function SetPage() {
                                 key={correction.id}
                                 className={`rounded-lg border p-4 ${
                                   correction.resolved
-                                    ? "border-gray-100 bg-gray-50"
+                                    ? "border-gray-100 bg-white"
                                     : "border-gray-200 bg-white"
                                 }`}
                               >
@@ -691,7 +691,7 @@ export default function SetPage() {
                                       onClick={() =>
                                         toggleCorrection(correction)
                                       }
-                                      className="shrink-0 text-left text-xs font-medium text-gray-600 hover:text-black sm:text-right"
+                                      className="shrink-0 text-left text-xs font-medium text-gray-600 hover:text-[#1D4ED8] sm:text-right"
                                     >
                                       {correction.resolved
                                         ? "Reopen"
@@ -711,7 +711,7 @@ export default function SetPage() {
                         <button
                           type="button"
                           onClick={() => openCorrectionModal(video)}
-                          className="text-sm font-medium text-gray-500 hover:text-black"
+                          className="text-sm font-semibold text-gray-500 hover:text-[#1D4ED8]"
                         >
                           + Add first correction
                         </button>
@@ -728,7 +728,7 @@ export default function SetPage() {
       {/* Add Video Modal */}
       {showVideoModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-          <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl">
+          <div className="w-full max-w-lg rounded-xl bg-white p-6 shadow-xl">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <h2 className="text-xl font-semibold">Add video</h2>
@@ -740,7 +740,7 @@ export default function SetPage() {
               <button
                 type="button"
                 onClick={() => setShowVideoModal(false)}
-                className="text-xl leading-none text-gray-400 hover:text-black"
+                className="text-xl leading-none text-gray-400 hover:text-[#1D4ED8]"
               >
                 ×
               </button>
@@ -756,7 +756,7 @@ export default function SetPage() {
                   value={videoTitle}
                   onChange={(e) => setVideoTitle(e.target.value)}
                   placeholder="e.g. Full Run - Week 3"
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none transition focus:border-black"
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none transition focus:border-[#2563EB] focus:ring-2 focus:ring-blue-100"
                 />
               </div>
 
@@ -769,7 +769,7 @@ export default function SetPage() {
                   value={videoUrl}
                   onChange={(e) => setVideoUrl(e.target.value)}
                   placeholder="https://..."
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none transition focus:border-black"
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none transition focus:border-[#2563EB] focus:ring-2 focus:ring-blue-100"
                 />
                 <p className="mt-1.5 text-xs text-gray-400">
                   Paste a Google Drive, YouTube, Vimeo, or other shareable video
@@ -786,7 +786,7 @@ export default function SetPage() {
                   <select
                     value={videoType}
                     onChange={(e) => setVideoType(e.target.value)}
-                    className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-black outline-none transition focus:border-black"
+                    className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-[#111111] outline-none transition focus:border-[#2563EB] focus:ring-2 focus:ring-blue-100"
                   >
                     {videoTypes.map((type) => (
                       <option key={type.value} value={type.value}>
@@ -807,7 +807,7 @@ export default function SetPage() {
                     value={partNumber}
                     onChange={(e) => setPartNumber(e.target.value)}
                     placeholder="Optional"
-                    className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none transition focus:border-black"
+                    className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none transition focus:border-[#2563EB] focus:ring-2 focus:ring-blue-100"
                   />
                 </div>
               </div>
@@ -816,7 +816,7 @@ export default function SetPage() {
                 <button
                   type="button"
                   onClick={() => setShowVideoModal(false)}
-                  className="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium transition hover:border-black"
+                  className="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium transition hover:border-[#2563EB]"
                 >
                   Cancel
                 </button>
@@ -824,7 +824,7 @@ export default function SetPage() {
                 <button
                   type="submit"
                   disabled={addingVideo}
-                  className="rounded-lg bg-black px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="rounded-full bg-[#2563EB] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#1D4ED8] disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {addingVideo ? "Adding..." : "Add video"}
                 </button>
@@ -837,7 +837,7 @@ export default function SetPage() {
       {/* Add Correction Modal */}
       {showCorrectionModal && selectedVideo && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-          <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl">
+          <div className="w-full max-w-lg rounded-xl bg-white p-6 shadow-xl">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <h2 className="text-xl font-semibold">Add correction</h2>
@@ -852,7 +852,7 @@ export default function SetPage() {
                   setShowCorrectionModal(false);
                   setSelectedVideo(null);
                 }}
-                className="text-xl leading-none text-gray-400 hover:text-black"
+                className="text-xl leading-none text-gray-400 hover:text-[#1D4ED8]"
               >
                 ×
               </button>
@@ -870,7 +870,7 @@ export default function SetPage() {
                     value={correctionTimestamp}
                     onChange={(e) => setCorrectionTimestamp(e.target.value)}
                     placeholder="0:12"
-                    className="w-full rounded-lg border border-gray-300 px-3 py-2.5 font-mono text-sm outline-none transition focus:border-black"
+                    className="w-full rounded-lg border border-gray-300 px-3 py-2.5 font-mono text-sm outline-none transition focus:border-[#2563EB] focus:ring-2 focus:ring-blue-100"
                   />
 
                   <p className="mt-1.5 text-xs text-gray-400">
@@ -886,7 +886,7 @@ export default function SetPage() {
                   <select
                     value={correctionDancer}
                     onChange={(e) => setCorrectionDancer(e.target.value)}
-                    className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-black outline-none transition focus:border-black"
+                    className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-[#111111] outline-none transition focus:border-[#2563EB] focus:ring-2 focus:ring-blue-100"
                   >
                     <option value="">Select dancer</option>
 
@@ -911,7 +911,7 @@ export default function SetPage() {
                   onChange={(e) => setCorrectionComment(e.target.value)}
                   placeholder="e.g. Keep your chest more lifted through this transition."
                   rows={4}
-                  className="w-full resize-none rounded-lg border border-gray-300 px-3 py-2.5 text-sm leading-6 outline-none transition focus:border-black"
+                  className="w-full resize-none rounded-lg border border-gray-300 px-3 py-2.5 text-sm leading-6 outline-none transition focus:border-[#2563EB] focus:ring-2 focus:ring-blue-100"
                 />
               </div>
 
@@ -922,7 +922,7 @@ export default function SetPage() {
                     setShowCorrectionModal(false);
                     setSelectedVideo(null);
                   }}
-                  className="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium transition hover:border-black"
+                  className="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium transition hover:border-[#2563EB]"
                 >
                   Cancel
                 </button>
@@ -930,7 +930,7 @@ export default function SetPage() {
                 <button
                   type="submit"
                   disabled={addingCorrection}
-                  className="rounded-lg bg-black px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="rounded-full bg-[#2563EB] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#1D4ED8] disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {addingCorrection ? "Adding..." : "Add correction"}
                 </button>

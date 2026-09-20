@@ -331,14 +331,14 @@ export default function MembersPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-white px-6 py-10 text-slate-900">
+      <main className="min-h-screen bg-white px-6 py-10 text-[#111111]">
         <div className="mx-auto max-w-6xl">
           <div className="animate-pulse space-y-6">
-            <div className="h-8 w-40 rounded bg-slate-200" />
-            <div className="h-24 rounded-2xl bg-slate-100" />
-            <div className="h-20 rounded-2xl bg-slate-100" />
-            <div className="h-20 rounded-2xl bg-slate-100" />
-            <div className="h-20 rounded-2xl bg-slate-100" />
+            <div className="h-8 w-40 rounded bg-gray-100" />
+            <div className="h-24 rounded-xl bg-gray-100" />
+            <div className="h-20 rounded-xl bg-gray-100" />
+            <div className="h-20 rounded-xl bg-gray-100" />
+            <div className="h-20 rounded-xl bg-gray-100" />
           </div>
         </div>
       </main>
@@ -346,25 +346,25 @@ export default function MembersPage() {
   }
 
   return (
-    <main className="min-h-screen bg-white px-6 py-8 text-slate-900">
+    <main className="min-h-screen bg-white px-6 py-8 text-[#111111]">
       <AppNav />
       <div className="mx-auto max-w-6xl">
         {/* Header */}
         <div className="mb-8">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <p className="mb-1 text-sm font-medium text-slate-500">
+              <p className="mb-1 text-sm font-medium text-gray-500">
                 {activeTeam?.name ?? "Team"}
               </p>
 
               <h1 className="text-3xl font-semibold tracking-tight">Members</h1>
 
-              <p className="mt-2 text-sm text-slate-500">
+              <p className="mt-2 text-sm text-gray-500">
                 Manage your team roster and roles.
               </p>
             </div>
 
-            <div className="text-sm text-slate-500">
+            <div className="text-sm text-gray-500">
               {members.length} {members.length === 1 ? "member" : "members"}
             </div>
           </div>
@@ -378,33 +378,33 @@ export default function MembersPage() {
         )}
 
         {success && (
-          <div className="mb-6 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+          <div className="mb-6 rounded-xl border border-lime-200 bg-lime-50 px-4 py-3 text-sm text-green-700">
             {success}
           </div>
         )}
 
         {/* Invite Card */}
         {activeTeam?.invite_code && (
-          <section className="mb-8 rounded-2xl border border-slate-200 bg-slate-50 p-5">
+          <section className="mb-8 rounded-xl border border-gray-200 bg-gray-50 p-5">
             <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <h2 className="text-base font-semibold">Invite members</h2>
 
-                <p className="mt-1 text-sm text-slate-500">
+                <p className="mt-1 text-sm text-gray-500">
                   Share this code with dancers who want to join{" "}
                   {activeTeam.name}.
                 </p>
               </div>
 
               <div className="flex items-center gap-3">
-                <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 font-mono text-lg font-semibold tracking-[0.18em] text-slate-900">
+                <div className="rounded-xl border border-gray-200 bg-white px-4 py-3 font-mono text-lg font-semibold tracking-[0.18em] text-[#111111]">
                   {activeTeam.invite_code}
                 </div>
 
                 <button
                   type="button"
                   onClick={copyInviteCode}
-                  className="rounded-xl bg-slate-900 px-4 py-3 text-sm font-medium text-white transition hover:bg-slate-800"
+                  className="rounded-full bg-[#2563EB] px-4 py-3 text-sm font-medium text-white transition hover:bg-[#1D4ED8]"
                 >
                   {copied ? "Copied" : "Copy"}
                 </button>
@@ -419,23 +419,23 @@ export default function MembersPage() {
             <h2 className="text-lg font-semibold">Team roster</h2>
 
             {isDirector && (
-              <span className="text-xs font-medium text-slate-400">
+              <span className="text-xs font-medium text-gray-400">
                 Director controls enabled
               </span>
             )}
           </div>
 
           {members.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-slate-300 px-6 py-12 text-center">
-              <h3 className="font-medium text-slate-900">No members yet</h3>
+            <div className="rounded-xl border border-dashed border-gray-300 px-6 py-12 text-center">
+              <h3 className="font-medium text-[#111111]">No members yet</h3>
 
-              <p className="mt-2 text-sm text-slate-500">
+              <p className="mt-2 text-sm text-gray-500">
                 Share your invite code to start building the team.
               </p>
             </div>
           ) : (
-            <div className="overflow-hidden rounded-2xl border border-slate-200">
-              <div className="divide-y divide-slate-200">
+            <div className="overflow-hidden rounded-xl border border-gray-200">
+              <div className="divide-y divide-gray-200">
                 {members.map((member) => {
                   const name =
                     member.profile?.name ||
@@ -462,28 +462,28 @@ export default function MembersPage() {
                             className="h-11 w-11 rounded-full object-cover"
                           />
                         ) : (
-                          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-slate-100 text-sm font-semibold text-slate-600">
+                          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gray-100 text-sm font-semibold text-gray-600">
                             {getInitials(name, email)}
                           </div>
                         )}
 
                         <div className="min-w-0">
                           <div className="flex flex-wrap items-center gap-2">
-                            <p className="truncate font-medium text-slate-900">
+                            <p className="truncate font-medium text-[#111111]">
                               {name}
                             </p>
 
                             {isCurrentUser && (
-                              <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-500">
+                              <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[11px] font-medium text-gray-500">
                                 You
                               </span>
                             )}
                           </div>
 
-                          <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-500">
+                          <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-gray-500">
                             <span>{formatRole(member.role)}</span>
 
-                            <span className="text-slate-300">•</span>
+                            <span className="text-gray-300">•</span>
 
                             <span>
                               {formatMemberSince(
@@ -494,7 +494,7 @@ export default function MembersPage() {
                           </div>
 
                           {email && (
-                            <p className="mt-1 truncate text-xs text-slate-400">
+                            <p className="mt-1 truncate text-xs text-gray-400">
                               {email}
                             </p>
                           )}
@@ -510,7 +510,7 @@ export default function MembersPage() {
                             onChange={(event) =>
                               changeRole(member, event.target.value)
                             }
-                            className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 outline-none transition focus:border-slate-400 disabled:cursor-not-allowed disabled:opacity-50"
+                            className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 outline-none transition focus:border-[#2563EB] disabled:cursor-not-allowed disabled:opacity-50"
                             aria-label={`Change role for ${name}`}
                           >
                             {ROLE_OPTIONS.map((role) => (
@@ -531,7 +531,7 @@ export default function MembersPage() {
                         </div>
                       ) : (
                         <div className="flex items-center">
-                          <span className="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-600">
+                          <span className="rounded-full bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-600">
                             {ROLE_DESCRIPTIONS[member.role] ??
                               formatRole(member.role)}
                           </span>

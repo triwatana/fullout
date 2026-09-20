@@ -424,8 +424,8 @@ export default function CalendarPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-white text-black">
-        <div className="mx-auto max-w-6xl px-6 py-10">
+      <main className="min-h-screen bg-white text-[#111111]">
+        <div className="mx-auto max-w-6xl px-6 py-8">
           <p className="text-sm text-gray-500">Loading calendar...</p>
         </div>
       </main>
@@ -434,7 +434,7 @@ export default function CalendarPage() {
 
   if (!activeTeam) {
     return (
-      <main className="min-h-screen bg-white text-black">
+      <main className="min-h-screen bg-white text-[#111111]">
         <div className="mx-auto max-w-2xl px-6 py-16">
           <h1 className="text-2xl font-semibold">Welcome to FullOut</h1>
 
@@ -444,7 +444,7 @@ export default function CalendarPage() {
 
           <Link
             href="/onboarding"
-            className="mt-6 inline-flex rounded-lg bg-black px-4 py-2.5 text-sm font-medium text-white"
+            className="mt-6 inline-flex rounded-full bg-[#2563EB] px-4 py-2.5 text-sm font-medium text-white"
           >
             Get started
           </Link>
@@ -476,7 +476,7 @@ export default function CalendarPage() {
   ).length;
 
   return (
-    <main className="min-h-screen bg-white text-black">
+    <main className="min-h-screen bg-white text-[#111111]">
       <AppNav />
       <div className="mx-auto max-w-6xl px-6 py-8">
         <header className="flex flex-col justify-between gap-5 sm:flex-row sm:items-center">
@@ -496,7 +496,7 @@ export default function CalendarPage() {
 
                 window.location.reload();
               }}
-              className="rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-black"
+              className="rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-blue-100"
             >
               {teams.map((team) => (
                 <option key={team.id} value={team.id}>
@@ -526,7 +526,7 @@ export default function CalendarPage() {
             {leader && (
               <button
                 onClick={() => setShowCreate(!showCreate)}
-                className="rounded-lg bg-black px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800"
+                className="rounded-full bg-[#2563EB] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#1D4ED8]"
               >
                 {showCreate ? "Cancel" : "New rehearsal"}
               </button>
@@ -548,7 +548,7 @@ export default function CalendarPage() {
                     value={title}
                     onChange={(event) => setTitle(event.target.value)}
                     placeholder="Rehearsal"
-                    className="mt-1.5 w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-black"
+                    className="mt-1.5 w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-blue-100"
                   />
                 </div>
 
@@ -559,7 +559,7 @@ export default function CalendarPage() {
                     type="date"
                     value={date}
                     onChange={(event) => setDate(event.target.value)}
-                    className="mt-1.5 w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-black"
+                    className="mt-1.5 w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-blue-100"
                   />
                 </div>
 
@@ -570,7 +570,7 @@ export default function CalendarPage() {
                     type="time"
                     value={startTime}
                     onChange={(event) => setStartTime(event.target.value)}
-                    className="mt-1.5 w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-black"
+                    className="mt-1.5 w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-blue-100"
                   />
                 </div>
 
@@ -581,7 +581,7 @@ export default function CalendarPage() {
                     type="time"
                     value={endTime}
                     onChange={(event) => setEndTime(event.target.value)}
-                    className="mt-1.5 w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-black"
+                    className="mt-1.5 w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-blue-100"
                   />
                 </div>
 
@@ -592,7 +592,7 @@ export default function CalendarPage() {
                     value={location}
                     onChange={(event) => setLocation(event.target.value)}
                     placeholder="Dance studio"
-                    className="mt-1.5 w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-black"
+                    className="mt-1.5 w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-blue-100"
                   />
                 </div>
 
@@ -602,7 +602,7 @@ export default function CalendarPage() {
                   <select
                     value={setId}
                     onChange={(event) => setSetId(event.target.value)}
-                    className="mt-1.5 w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-black"
+                    className="mt-1.5 w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-blue-100"
                   >
                     <option value="">No set</option>
 
@@ -622,7 +622,7 @@ export default function CalendarPage() {
                     onChange={(event) => setNotes(event.target.value)}
                     placeholder="What should dancers know?"
                     rows={3}
-                    className="mt-1.5 w-full resize-none rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-black"
+                    className="mt-1.5 w-full resize-none rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-blue-100"
                   />
                 </div>
               </div>
@@ -630,7 +630,7 @@ export default function CalendarPage() {
               <button
                 type="submit"
                 disabled={saving}
-                className="mt-5 rounded-lg bg-black px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50"
+                className="mt-5 rounded-full bg-[#2563EB] px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50"
               >
                 {saving ? "Creating..." : "Schedule rehearsal"}
               </button>
@@ -658,7 +658,7 @@ export default function CalendarPage() {
                     onClick={() => setSelectedRehearsal(rehearsal)}
                     className={`w-full rounded-xl border p-5 text-left transition ${
                       selected
-                        ? "border-black"
+                        ? "border-[#2563EB]"
                         : "border-gray-200 hover:border-gray-400"
                     }`}
                   >
@@ -736,7 +736,7 @@ export default function CalendarPage() {
 
                 <Link
                   href={`/attendance?rehearsal=${selectedRehearsal.id}`}
-                  className="rounded-lg bg-black px-4 py-2.5 text-center text-sm font-medium text-white transition hover:bg-gray-800"
+                  className="rounded-full bg-[#2563EB] px-4 py-2.5 text-center text-sm font-medium text-white transition hover:bg-[#1D4ED8]"
                 >
                   Take attendance
                 </Link>
@@ -795,8 +795,8 @@ export default function CalendarPage() {
                                 disabled={saving}
                                 className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition ${
                                   status === option
-                                    ? "border-black bg-black text-white"
-                                    : "border-gray-300 text-gray-600 hover:border-black hover:text-black"
+                                    ? "border-[#2563EB] bg-[#2563EB] text-white"
+                                    : "border-gray-300 text-gray-600 hover:border-[#2563EB] hover:text-[#1D4ED8]"
                                 }`}
                               >
                                 {option.charAt(0).toUpperCase() +
@@ -806,7 +806,7 @@ export default function CalendarPage() {
                           )}
                         </div>
                       ) : (
-                        <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium capitalize text-gray-600">
+                        <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-medium capitalize text-[#1D4ED8]">
                           {status}
                         </span>
                       )}

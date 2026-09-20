@@ -292,8 +292,8 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-white text-black">
-        <div className="mx-auto max-w-6xl px-6 py-10">
+      <main className="min-h-screen bg-white text-[#111111]">
+        <div className="mx-auto max-w-6xl px-6 py-8">
           <p className="text-sm text-gray-500">Loading dashboard...</p>
         </div>
       </main>
@@ -302,7 +302,7 @@ export default function DashboardPage() {
 
   if (!activeTeam) {
     return (
-      <main className="min-h-screen bg-white text-black">
+      <main className="min-h-screen bg-white text-[#111111]">
         <div className="mx-auto max-w-2xl px-6 py-16">
           <h1 className="text-2xl font-semibold">Welcome to FullOut</h1>
 
@@ -312,7 +312,7 @@ export default function DashboardPage() {
 
           <Link
             href="/onboarding"
-            className="mt-6 inline-flex rounded-lg bg-black px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800"
+            className="mt-6 inline-flex rounded-full bg-[#2563EB] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#1D4ED8]"
           >
             Get started
           </Link>
@@ -322,12 +322,11 @@ export default function DashboardPage() {
   }
 
   return (
-    <main className="min-h-screen bg-white text-black">
-      <div className="mx-auto max-w-6xl px-6 py-6">
+    <main className="min-h-screen bg-white text-[#111111]">
+      <div className="mx-auto max-w-6xl px-6 py-8">
         <AppNav />
         {/* Header */}
         <header className="mt-6 flex flex-col justify-between gap-5 sm:flex-row sm:items-center">
-          {" "}
           <div>
             <h1 className="text-3xl font-semibold tracking-tight">Dashboard</h1>
           </div>
@@ -338,7 +337,7 @@ export default function DashboardPage() {
               <select
                 value={activeTeam.id}
                 onChange={(e) => switchTeam(e.target.value)}
-                className="rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-black outline-none focus:border-black"
+                className="rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-[#111111] outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-blue-100"
               >
                 {teams.map((team) => (
                   <option key={team.id} value={team.id}>
@@ -364,7 +363,7 @@ export default function DashboardPage() {
             <h2 className="text-2xl font-semibold">{activeTeam.name}</h2>
 
             {activeMembership?.role && (
-              <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium capitalize text-gray-600">
+              <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-medium capitalize text-[#1D4ED8]">
                 {activeMembership.role}
               </span>
             )}
@@ -373,7 +372,7 @@ export default function DashboardPage() {
 
         {/* Stats */}
         <section className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <div className="rounded-xl border border-gray-200 p-5">
+          <div className="rounded-xl border border-gray-200 border-t-4 border-t-[#2563EB] p-5">
             <p className="text-sm text-gray-500">Team</p>
 
             <p className="mt-2 text-2xl font-semibold">{activeTeam.name}</p>
@@ -383,7 +382,7 @@ export default function DashboardPage() {
             </p>
           </div>
 
-          <div className="rounded-xl border border-gray-200 p-5">
+          <div className="rounded-xl border border-gray-200 border-t-4 border-t-[#A3E635] p-5">
             <p className="text-sm text-gray-500">Sets</p>
 
             <p className="mt-2 text-2xl font-semibold">{sets.length}</p>
@@ -394,8 +393,10 @@ export default function DashboardPage() {
           </div>
 
           <div
-            className={`rounded-xl border p-5 ${
-              openCorrections.length > 0 ? "border-black" : "border-gray-200"
+            className={`rounded-xl border border-t-4 p-5 ${
+              openCorrections.length > 0
+                ? "border-[#2563EB] border-t-[#2563EB]"
+                : "border-gray-200 border-t-gray-200"
             }`}
           >
             <p className="text-sm text-gray-500">Open corrections</p>
@@ -433,7 +434,7 @@ export default function DashboardPage() {
 
             <Link
               href="/corrections"
-              className="shrink-0 text-sm font-medium text-gray-600 transition hover:text-black"
+              className="shrink-0 text-sm font-medium text-gray-600 transition hover:text-[#1D4ED8]"
             >
               View all →
             </Link>
@@ -473,7 +474,7 @@ export default function DashboardPage() {
                   <Link
                     key={correction.id}
                     href={`/sets/${set.id}`}
-                    className="block rounded-xl border border-gray-200 bg-white p-4 transition hover:border-gray-400 hover:bg-gray-50"
+                    className="block rounded-xl border border-gray-200 bg-white p-4 transition hover:border-gray-400 hover:bg-white"
                   >
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                       <div className="min-w-0">
@@ -499,7 +500,7 @@ export default function DashboardPage() {
                       </div>
 
                       <div className="flex shrink-0 items-center gap-2">
-                        <span className="rounded-full bg-black px-2.5 py-1 text-xs font-medium text-white">
+                        <span className="rounded-full bg-[#2563EB] px-2.5 py-1 text-xs font-medium text-white">
                           Open
                         </span>
 

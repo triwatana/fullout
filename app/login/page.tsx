@@ -45,7 +45,7 @@ export default function LoginPage() {
         </div>
 
         <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-8">
-          <h2 className="text-2xl font-semibold">Welcome back</h2>
+          <h2 className="text-2xl font-semibold">Welcome back!</h2>
 
           <p className="mt-2 text-sm text-zinc-400">
             Log in to your team workspace.
