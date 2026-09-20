@@ -72,6 +72,10 @@ export default function CorrectionsPage() {
 
   const [filter, setFilter] = useState<"open" | "resolved" | "all">("open");
 
+  const [selectedCorrections, setSelectedCorrections] = useState<string[]>([]);
+
+  const [deleting, setDeleting] = useState(false);
+
   /*
    * Director, Captain, and Choreographer can manage all corrections.
    */
@@ -156,6 +160,7 @@ export default function CorrectionsPage() {
         setVideos([]);
         setCorrections([]);
         setProfiles([]);
+        setSelectedCorrections([]);
         return;
       }
 
@@ -181,6 +186,7 @@ export default function CorrectionsPage() {
       if (loadedVideos.length === 0) {
         setCorrections([]);
         setProfiles([]);
+        setSelectedCorrections([]);
         return;
       }
 
@@ -206,11 +212,7 @@ export default function CorrectionsPage() {
       let loadedCorrections = correctionData ?? [];
 
       /*
-       * IMPORTANT:
        * Use membership.role here rather than React state `role`.
-       *
-       * React state updates are asynchronous, so `role` may still be null
-       * during this function's first execution.
        */
       const membershipIsLeader =
         membership.role === "director" ||
@@ -229,6 +231,7 @@ export default function CorrectionsPage() {
       }
 
       setCorrections(loadedCorrections);
+      setSelectedCorrections([]);
 
       /*
        * Load profile names for dancers and creators.
@@ -310,6 +313,77 @@ export default function CorrectionsPage() {
     (correction) => correction.resolved,
   ).length;
 
+  function canDeleteCorrection(correction: Correction) {
+    return correction.created_by === currentUserId || isLeader;
+  }
+
+  function toggleSelectedCorrection(correctionId: string) {
+    setSelectedCorrections((current) =>
+      current.includes(correctionId)
+        ? current.filter((id) => id !== correctionId)
+        : [...current, correctionId],
+    );
+  }
+
+  function toggleSelectAll() {
+    const deletableVisibleCorrections = visibleCorrections
+      .filter(canDeleteCorrection)
+      .map((correction) => correction.id);
+
+    if (deletableVisibleCorrections.length === 0) return;
+
+    const allSelected = deletableVisibleCorrections.every((id) =>
+      selectedCorrections.includes(id),
+    );
+
+    if (allSelected) {
+      setSelectedCorrections((current) =>
+        current.filter((id) => !deletableVisibleCorrections.includes(id)),
+      );
+    } else {
+      setSelectedCorrections((current) => [
+        ...new Set([...current, ...deletableVisibleCorrections]),
+      ]);
+    }
+  }
+
+  async function deleteSelectedCorrections() {
+    if (selectedCorrections.length === 0) return;
+
+    const confirmed = window.confirm(
+      `Delete ${selectedCorrections.length} correction${
+        selectedCorrections.length === 1 ? "" : "s"
+      }? This cannot be undone.`,
+    );
+
+    if (!confirmed) return;
+
+    setDeleting(true);
+    setError("");
+
+    try {
+      const { error: deleteError } = await supabase
+        .from("corrections")
+        .delete()
+        .in("id", selectedCorrections);
+
+      if (deleteError) {
+        setError(deleteError.message);
+        return;
+      }
+
+      setCorrections((current) =>
+        current.filter(
+          (correction) => !selectedCorrections.includes(correction.id),
+        ),
+      );
+
+      setSelectedCorrections([]);
+    } finally {
+      setDeleting(false);
+    }
+  }
+
   async function toggleCorrection(correction: Correction) {
     if (!currentUserId) return;
 
@@ -346,10 +420,10 @@ export default function CorrectionsPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-white text-[#111111]">
-        <AppNav />
-        <div className="mx-auto max-w-6xl px-6 py-8">
-          <p className="text-sm text-gray-500">Loading corrections...</p>
+      <main className="min-h-screen bg-white text-black">
+        <div className="mx-auto max-w-6xl px-6 py-10">
+          <AppNav />
+          <p className="mt-8 text-sm text-gray-500">Loading corrections...</p>
         </div>
       </main>
     );
@@ -357,36 +431,48 @@ export default function CorrectionsPage() {
 
   if (!team) {
     return (
-      <main className="min-h-screen bg-white text-[#111111]">
+      <main className="min-h-screen bg-white text-black">
         <div className="mx-auto max-w-6xl px-6 py-8">
-          <p className="text-sm text-gray-500">{error || "Team not found."}</p>
+          <AppNav />
+
+          <div className="mt-8">
+            <p className="text-sm text-gray-500">
+              {error || "Team not found."}
+            </p>
+          </div>
         </div>
       </main>
     );
   }
 
+  const deletableVisibleCorrections =
+    visibleCorrections.filter(canDeleteCorrection);
+
+  const allVisibleDeletableSelected =
+    deletableVisibleCorrections.length > 0 &&
+    deletableVisibleCorrections.every((correction) =>
+      selectedCorrections.includes(correction.id),
+    );
+
   return (
-    <main className="min-h-screen bg-white text-[#111111]">
-      <AppNav />
+    <main className="min-h-screen bg-white text-black">
       <div className="mx-auto max-w-6xl px-6 py-8">
+        <AppNav />
+
         {/* Header */}
-        <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
-          <div>
-            <p className="mt-6 text-sm font-medium text-gray-500">
-              {team.name}
-            </p>
+        <header className="mt-8">
+          <p className="text-sm font-medium text-gray-500">{team.name}</p>
 
-            <h1 className="mt-1 text-3xl font-semibold tracking-tight">
-              Corrections
-            </h1>
+          <h1 className="mt-1 text-3xl font-semibold tracking-tight">
+            Corrections
+          </h1>
 
-            <p className="mt-2 text-sm text-gray-500">
-              {isLeader
-                ? "Review and manage feedback across your team's sets."
-                : "Keep track of the feedback assigned to you."}
-            </p>
-          </div>
-        </div>
+          <p className="mt-2 text-sm text-gray-500">
+            {isLeader
+              ? "Review and manage feedback across your team's sets."
+              : "Keep track of the feedback assigned to you."}
+          </p>
+        </header>
 
         {error && (
           <div className="mt-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3">
@@ -401,7 +487,7 @@ export default function CorrectionsPage() {
             onClick={() => setFilter("open")}
             className={`rounded-xl border p-5 text-left transition ${
               filter === "open"
-                ? "border-[#2563EB]"
+                ? "border-black"
                 : "border-gray-200 hover:border-gray-400"
             }`}
           >
@@ -414,7 +500,7 @@ export default function CorrectionsPage() {
             onClick={() => setFilter("resolved")}
             className={`rounded-xl border p-5 text-left transition ${
               filter === "resolved"
-                ? "border-[#2563EB]"
+                ? "border-black"
                 : "border-gray-200 hover:border-gray-400"
             }`}
           >
@@ -427,7 +513,7 @@ export default function CorrectionsPage() {
             onClick={() => setFilter("all")}
             className={`rounded-xl border p-5 text-left transition ${
               filter === "all"
-                ? "border-[#2563EB]"
+                ? "border-black"
                 : "border-gray-200 hover:border-gray-400"
             }`}
           >
@@ -451,14 +537,51 @@ export default function CorrectionsPage() {
               }
               className={`border-b-2 px-4 py-3 text-sm font-medium transition ${
                 filter === item.value
-                  ? "border-[#2563EB] text-[#111111]"
-                  : "border-transparent text-gray-500 hover:text-[#1D4ED8]"
+                  ? "border-black text-black"
+                  : "border-transparent text-gray-500 hover:text-black"
               }`}
             >
               {item.label}
             </button>
           ))}
         </div>
+
+        {/* Selection toolbar */}
+        {visibleCorrections.length > 0 &&
+          deletableVisibleCorrections.length > 0 && (
+            <div className="mt-6 flex items-center justify-between rounded-xl border border-gray-200 bg-gray-50 px-4 py-3">
+              <label className="flex cursor-pointer items-center gap-3">
+                <input
+                  type="checkbox"
+                  checked={allVisibleDeletableSelected}
+                  onChange={toggleSelectAll}
+                  className="h-4 w-4 rounded border-gray-300"
+                  aria-label="Select all corrections"
+                />
+
+                <span className="text-sm font-medium text-gray-700">
+                  Select all
+                </span>
+              </label>
+
+              {selectedCorrections.length > 0 && (
+                <div className="flex items-center gap-3">
+                  <span className="text-sm text-gray-500">
+                    {selectedCorrections.length} selected
+                  </span>
+
+                  <button
+                    type="button"
+                    onClick={deleteSelectedCorrections}
+                    disabled={deleting}
+                    className="rounded-lg bg-red-600 px-3 py-2 text-sm font-medium text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {deleting ? "Deleting..." : "Delete selected"}
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
 
         {/* Corrections list */}
         {visibleCorrections.length === 0 ? (
@@ -483,7 +606,7 @@ export default function CorrectionsPage() {
               {isLeader && filter !== "resolved" && (
                 <Link
                   href="/sets"
-                  className="mt-5 inline-flex rounded-full bg-[#2563EB] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#1D4ED8]"
+                  className="mt-5 inline-flex rounded-lg bg-black px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800"
                 >
                   Go to Sets
                 </Link>
@@ -503,102 +626,122 @@ export default function CorrectionsPage() {
                 correction.created_by === currentUserId ||
                 isLeader;
 
+              const canDelete = canDeleteCorrection(correction);
+
               return (
                 <div
                   key={correction.id}
                   className={`rounded-xl border p-5 transition ${
-                    correction.resolved
-                      ? "border-gray-200 bg-white"
-                      : "border-gray-200 bg-white"
+                    selectedCorrections.includes(correction.id)
+                      ? "border-red-300 bg-red-50/30"
+                      : correction.resolved
+                        ? "border-gray-200 bg-gray-50"
+                        : "border-gray-200 bg-white"
                   }`}
                 >
-                  <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
-                    <div className="min-w-0">
-                      {/* Set + video */}
-                      <div className="flex flex-wrap items-center gap-2">
-                        <Link
-                          href={`/sets/${set.id}`}
-                          className="text-sm font-semibold hover:underline"
-                        >
-                          {set.name}
-                        </Link>
+                  <div className="flex items-start gap-4">
+                    {canDelete && (
+                      <input
+                        type="checkbox"
+                        checked={selectedCorrections.includes(correction.id)}
+                        onChange={() => toggleSelectedCorrection(correction.id)}
+                        className="mt-1 h-4 w-4 shrink-0 rounded border-gray-300"
+                        aria-label={`Select correction: ${correction.comment}`}
+                      />
+                    )}
 
-                        <span className="text-gray-300">/</span>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+                        <div className="min-w-0">
+                          {/* Set + video */}
+                          <div className="flex flex-wrap items-center gap-2">
+                            <Link
+                              href={`/sets/${set.id}`}
+                              className="text-sm font-semibold hover:underline"
+                            >
+                              {set.name}
+                            </Link>
 
-                        <span className="text-sm text-gray-500">
-                          {video.title}
-                        </span>
+                            <span className="text-gray-300">/</span>
+
+                            <span className="text-sm text-gray-500">
+                              {video.title}
+                            </span>
+                          </div>
+
+                          {/* Timestamp */}
+                          <div className="mt-4 flex items-center gap-3">
+                            <span className="rounded-md bg-gray-100 px-2.5 py-1.5 font-mono text-sm font-medium text-gray-700">
+                              {formatTimestamp(correction.timestamp_seconds)}
+                            </span>
+
+                            {correction.resolved ? (
+                              <span className="rounded-full bg-gray-200 px-2.5 py-1 text-xs font-medium text-gray-500">
+                                Resolved
+                              </span>
+                            ) : (
+                              <span className="rounded-full bg-black px-2.5 py-1 text-xs font-medium text-white">
+                                Open
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Correction */}
+                          <p
+                            className={`mt-4 max-w-3xl text-sm leading-6 ${
+                              correction.resolved
+                                ? "text-gray-400"
+                                : "text-gray-700"
+                            }`}
+                          >
+                            {correction.comment}
+                          </p>
+
+                          {/* People */}
+                          <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-xs text-gray-500">
+                            <span>
+                              <span className="text-gray-400">
+                                Assigned to:
+                              </span>{" "}
+                              {getProfileName(correction.dancer_id)}
+                            </span>
+
+                            <span>
+                              <span className="text-gray-400">Added by:</span>{" "}
+                              {getProfileName(correction.created_by)}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="flex shrink-0 flex-wrap gap-2">
+                          <a
+                            href={video.video_url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium transition hover:border-black hover:bg-gray-50"
+                          >
+                            Open video
+                          </a>
+
+                          <Link
+                            href={`/sets/${set.id}`}
+                            className="rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium transition hover:border-black hover:bg-gray-50"
+                          >
+                            Open set
+                          </Link>
+
+                          {canResolve && (
+                            <button
+                              type="button"
+                              onClick={() => toggleCorrection(correction)}
+                              className="rounded-lg bg-black px-3 py-2 text-sm font-medium text-white transition hover:bg-gray-800"
+                            >
+                              {correction.resolved ? "Reopen" : "Mark resolved"}
+                            </button>
+                          )}
+                        </div>
                       </div>
-
-                      {/* Timestamp */}
-                      <div className="mt-4 flex items-center gap-3">
-                        <span className="rounded-md bg-gray-100 px-2.5 py-1.5 font-mono text-sm font-medium text-gray-700">
-                          {formatTimestamp(correction.timestamp_seconds)}
-                        </span>
-
-                        {correction.resolved ? (
-                          <span className="rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-500">
-                            Resolved
-                          </span>
-                        ) : (
-                          <span className="rounded-full bg-[#2563EB] px-2.5 py-1 text-xs font-medium text-white">
-                            Open
-                          </span>
-                        )}
-                      </div>
-
-                      {/* Correction */}
-                      <p
-                        className={`mt-4 max-w-3xl text-sm leading-6 ${
-                          correction.resolved
-                            ? "text-gray-400"
-                            : "text-gray-700"
-                        }`}
-                      >
-                        {correction.comment}
-                      </p>
-
-                      {/* People */}
-                      <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-xs text-gray-500">
-                        <span>
-                          <span className="text-gray-400">Assigned to:</span>{" "}
-                          {getProfileName(correction.dancer_id)}
-                        </span>
-
-                        <span>
-                          <span className="text-gray-400">Added by:</span>{" "}
-                          {getProfileName(correction.created_by)}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Actions */}
-                    <div className="flex shrink-0 flex-wrap gap-2">
-                      <a
-                        href={video.video_url}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium transition hover:border-[#2563EB] hover:bg-white"
-                      >
-                        Open video
-                      </a>
-
-                      <Link
-                        href={`/sets/${set.id}`}
-                        className="rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium transition hover:border-[#2563EB] hover:bg-white"
-                      >
-                        Open set
-                      </Link>
-
-                      {canResolve && (
-                        <button
-                          type="button"
-                          onClick={() => toggleCorrection(correction)}
-                          className="rounded-full bg-[#2563EB] px-3 py-2 text-sm font-medium text-white transition hover:bg-[#1D4ED8]"
-                        >
-                          {correction.resolved ? "Reopen" : "Mark resolved"}
-                        </button>
-                      )}
                     </div>
                   </div>
                 </div>

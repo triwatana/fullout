@@ -173,13 +173,10 @@ export default function Home() {
           <div className="relative z-10">
             <div className="flex items-center gap-3">
               <span className="h-1.5 w-14 rounded-full bg-[#A3E635]" />
-              <p className="text-sm font-bold uppercase tracking-[0.16em] text-[#334E75]">
-                The all-in-one workspace
-              </p>
             </div>
 
-            <p className="mt-2 text-sm font-bold uppercase tracking-[0.16em] text-[#334E75]">
-              For dance teams
+            <p className="mt-2 text-md font-bold uppercase tracking-[0.16em] text-[#334E75]">
+              The all-in-one workspace for dance teams
             </p>
 
             <h1 className="mt-7 max-w-3xl text-[3.7rem] font-black leading-[0.94] tracking-[-0.055em] sm:text-6xl lg:text-[5.25rem]">
@@ -236,10 +233,10 @@ export default function Home() {
 
             <div className="absolute bottom-12 left-4 rounded-2xl border border-white/70 bg-white/90 px-5 py-4 shadow-xl backdrop-blur sm:left-0">
               <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#1D4ED8]">
-                Built for teams
+                Built for dance teams
               </p>
               <p className="mt-1 text-xl font-black tracking-tight">
-                Plan. Rehearse. Improve.
+                Plan. Rehearse. Refine. Perform.
               </p>
             </div>
           </div>
